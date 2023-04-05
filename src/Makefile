@@ -1,6 +1,6 @@
 EXE		= quickbms
 # -m32 because QuickBMS has been tested only on 32bit systems and gives problems using 64bit native code
-CFLAGS	+= -m32 -s -O2 -fstack-protector-all -fno-unit-at-a-time -fno-omit-frame-pointer -fno-pie -fPIC -w
+CFLAGS	+= -s -O2 -fstack-protector-all -fno-unit-at-a-time -fno-omit-frame-pointer -fno-pie -fPIC -w
 # Add -DQUICKBMS64 to CDEFS for compiling quickbms_4gb_files
 # For static builds on Linux (no MacOSX due to -lcrt0 error) add: -static
 # -ldl is in CDEFS to avoid undefined references.
@@ -16,8 +16,8 @@ SRC		= $(EXE).c
 ifeq ($(shell uname -s), Darwin)
 CDEFS	+= -DFORCE_SATUR_SUB_128
 CFLAGS	+= -Dunix
-#CC		= gcc-6
-#CXX		= g++-6
+CC		= gcc-12
+CXX		= g++-12
 # necessary for my build, remove in case you don't have openssl
 USE_OPENSSL	= 1
 else
@@ -38,10 +38,10 @@ ifndef USE_OPENSSL
 CDEFS	+= -DDISABLE_SSL
 else
 ifeq ($(shell uname -s), Darwin)
-PREFIX_OPENSSL = `brew --prefix openssl`
+PREFIX_OPENSSL = `brew --prefix openssl@1.1`
 CFLAGS	+= -I$(PREFIX_OPENSSL)/include
 # openssl is 64bit only in brew and we need everything statically linked, so compile quickbms as 64bit
-CLIBS	+= -m64 $(PREFIX_OPENSSL)/lib/libssl.a $(PREFIX_OPENSSL)/lib/libcrypto.a
+CLIBS	+= $(PREFIX_OPENSSL)/lib/libssl.dylib $(PREFIX_OPENSSL)/lib/libcrypto.dylib
 else
 CLIBS	+= -lssl -lcrypto
 endif
